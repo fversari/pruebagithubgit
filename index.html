@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Clase Integradora 2 — Del prototipo al MVP. Vibe Coding · EducaciónIT.">
+  <title>Clase Integradora 2 · Vibe Coding — EducaciónIT</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Figtree:wght@300;400;500;600&display=swap');
+
+    :root {
+      --bg-0: oklch(9% 0.012 52); --bg-1: oklch(14% 0.015 52);
+      --bg-2: oklch(19% 0.018 52); --bg-3: oklch(25% 0.022 52);
+      --accent: oklch(72% 0.19 52); --accent-dim: oklch(58% 0.15 52);
+      --accent-bright: oklch(82% 0.20 52); --accent-tint: oklch(17% 0.04 52);
+      --text-1: oklch(93% 0.011 52); --text-2: oklch(67% 0.018 52);
+      --text-3: oklch(46% 0.013 52);
+      --border: oklch(28% 0.020 52); --border-subtle: oklch(19% 0.016 52);
+      --green: oklch(70% 0.17 152); --green-tint: oklch(17% 0.04 152);
+      --red: oklch(62% 0.18 24); --red-tint: oklch(16% 0.05 24);
+      --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px;
+      --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+      --font-display:'Barlow Semi Condensed',system-ui,sans-serif;
+      --font-body:'Figtree',system-ui,sans-serif;
+      --ease-out-quart:cubic-bezier(0.25,1,0.5,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;font-size:16px}
+    body{background:var(--bg-0);color:var(--text-1);font-family:var(--font-body);font-weight:400;line-height:1.65;overflow-x:hidden}
+    a{color:inherit}
+    button{font-family:inherit;cursor:pointer}
+
+    #progress{position:fixed;top:0;left:0;z-index:200;height:2px;width:0%;background:var(--accent);transition:width 80ms linear;pointer-events:none}
+
+    nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--s3) var(--s7);background:var(--bg-0);border-bottom:1px solid var(--border-subtle)}
+    .nav-brand{font-family:var(--font-display);font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);text-decoration:none}
+    .nav-brand strong{color:var(--accent);font-weight:800}
+    .nav-links{display:flex;gap:var(--s1);list-style:none}
+    .nav-link{font-family:var(--font-display);font-size:.7rem;font-weight:700;letter-spacing:.06em;padding:var(--s2) var(--s3);color:var(--text-3);text-decoration:none;border-radius:4px;transition:color 150ms,background 150ms}
+    .nav-link:hover{color:var(--text-1);background:var(--bg-2)}
+    .nav-link.active{color:var(--accent)}
+
+    .container{max-width:900px;margin:0 auto;padding:0 var(--s7)}
+
+    /* HERO */
+    .hero{padding:130px 0 var(--s9);position:relative;overflow:hidden}
+    .hero::after{content:'';position:absolute;top:0;right:-160px;width:560px;height:560px;background:radial-gradient(ellipse at center,oklch(25% 0.07 52 / 0.28) 0%,transparent 65%);pointer-events:none}
+    .hero-eyebrow{font-family:var(--font-display);font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s5)}
+    .hero-eyebrow::before{content:'';width:20px;height:1px;background:var(--accent)}
+    .hero-title{font-family:var(--font-display);font-size:clamp(3.2rem,9vw,6.5rem);font-weight:800;line-height:.95;letter-spacing:-.015em;color:var(--text-1);margin-bottom:var(--s6)}
+    .hero-title .class-label{display:block;font-size:clamp(.85rem,2vw,1.1rem);font-weight:600;letter-spacing:.12em;color:var(--accent);margin-bottom:var(--s2)}
+    .hero-lead{font-size:clamp(1rem,2.5vw,1.2rem);color:var(--text-2);max-width:56ch;line-height:1.6;margin-bottom:var(--s7)}
+    .hero-chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+    .chip{font-family:var(--font-display);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:var(--s2) var(--s3);border-radius:99px;border:1px solid var(--border);color:var(--text-2)}
+    .chip.accent{border-color:var(--accent-dim);color:var(--accent);background:var(--accent-tint)}
+
+    /* SECTIONS */
+    section.content-section{padding:var(--s8) 0;border-top:1px solid var(--border-subtle)}
+    .section-label{font-family:var(--font-display);font-size:.68rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--s3);display:flex;align-items:center;gap:var(--s3)}
+    .section-label::before{content:'';width:14px;height:1px;background:var(--accent)}
+    .section-title{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;line-height:1.05;letter-spacing:-.01em;color:var(--text-1);margin-bottom:var(--s5)}
+    .section-body{color:var(--text-2);line-height:1.7;max-width:62ch}
+    .section-body p{margin-bottom:var(--s4)}
+    .section-body p:last-child{margin-bottom:0}
+    .section-body strong{color:var(--text-1);font-weight:600}
+
+    /* CARD GRID */
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--s4);margin-top:var(--s6)}
+    .card{background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:12px;padding:var(--s5);transition:border-color 200ms,background 200ms}
+    .card:hover{border-color:var(--border);background:var(--bg-2)}
+    .card-icon{font-size:1.5rem;margin-bottom:var(--s3)}
+    .card-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-1);margin-bottom:var(--s2);letter-spacing:.01em}
+    .card-body{font-size:.875rem;color:var(--text-2);line-height:1.6}
+
+    /* STEPS */
+    .steps{display:flex;flex-direction:column;gap:var(--s4);margin-top:var(--s5)}
+    .step{display:flex;gap:var(--s4);align-items:flex-start}
+    .step-n{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--accent-tint);border:1px solid var(--accent-dim);color:var(--accent);font-family:var(--font-display);font-size:.875rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+    .step-content{flex:1}
+    .step-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-1);margin-bottom:var(--s1)}
+    .step-desc{font-size:.875rem;color:var(--text-2);line-height:1.6}
+
+    /* TABLE */
+    .data-table{width:100%;border-collapse:collapse;font-size:.875rem;margin-top:var(--s5)}
+    .data-table th{font-family:var(--font-display);font-size:.68rem;font-weight:800;letter-spacing:.10em;text-transform:uppercase;color:var(--text-3);padding:var(--s3) var(--s4);text-align:left;border-bottom:1px solid var(--border)}
+    .data-table td{padding:var(--s3) var(--s4);border-bottom:1px solid var(--border-subtle);color:var(--text-2);vertical-align:top;line-height:1.5}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table td strong{color:var(--text-1);font-weight:600}
+
+    /* QUOTE */
+    .pull-quote{margin:var(--s6) 0;padding:var(--s5) var(--s6);border-left:3px solid var(--accent);background:var(--accent-tint);border-radius:0 8px 8px 0}
+    .pull-quote p{font-size:1.05rem;font-style:italic;color:var(--text-1);line-height:1.65;max-width:52ch}
+
+    /* CHECKLIST */
+    .checklist{list-style:none;padding:0;display:flex;flex-direction:column;gap:var(--s3);margin-top:var(--s5)}
+    .checklist li{display:flex;align-items:flex-start;gap:var(--s3);font-size:.9rem;color:var(--text-2);line-height:1.55}
+    .checklist li::before{content:'→';color:var(--accent);font-family:var(--font-display);font-weight:800;flex-shrink:0;margin-top:1px}
+    .checklist li strong{color:var(--text-1);font-weight:600}
+
+    /* DIAGNOSTIC CHECKLIST */
+    .diag-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:var(--s3);margin-top:var(--s5)}
+    .diag-item{display:flex;gap:var(--s4);align-items:flex-start;background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:10px;padding:var(--s4) var(--s5);transition:border-color 200ms}
+    .diag-item:hover{border-color:var(--border)}
+    .diag-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--accent-tint);border:1px solid var(--accent-dim);color:var(--accent);font-family:var(--font-display);font-size:.8rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+    .diag-content{flex:1}
+    .diag-title{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--text-1);margin-bottom:var(--s1)}
+    .diag-desc{font-size:.85rem;color:var(--text-2);line-height:1.6}
+    .diag-how{font-size:.8rem;color:var(--text-3);margin-top:var(--s2);font-style:italic}
+
+    /* PROBLEM CARDS */
+    .problem-grid{display:flex;flex-direction:column;gap:var(--s4);margin-top:var(--s6)}
+    .problem-card{background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:12px;padding:var(--s5) var(--s6);transition:border-color 200ms}
+    .problem-card:hover{border-color:var(--border)}
+    .problem-header{display:flex;align-items:flex-start;gap:var(--s3);margin-bottom:var(--s3)}
+    .problem-icon{font-size:1.2rem;flex-shrink:0;margin-top:2px}
+    .problem-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-1)}
+    .problem-symptom{font-size:.8rem;font-weight:400;color:var(--text-3);font-style:italic;display:block;margin-top:2px}
+    .problem-fix{font-size:.875rem;color:var(--text-2);line-height:1.65}
+    .problem-fix strong{color:var(--text-1);font-weight:600}
+    .code-hint{display:inline-block;background:var(--bg-3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:monospace;font-size:.78rem;color:oklch(75% 0.12 193)}
+
+    /* PRIORITY STACK */
+    .priority-stack{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s5)}
+    .priority-row{display:flex;gap:var(--s4);align-items:center;padding:var(--s3) var(--s4);border-radius:8px}
+    .priority-row:nth-child(1){background:oklch(16% 0.05 24);border:1px solid oklch(28% 0.09 24)}
+    .priority-row:nth-child(2){background:oklch(16% 0.04 52);border:1px solid oklch(28% 0.08 52)}
+    .priority-row:nth-child(3){background:oklch(15% 0.03 193);border:1px solid oklch(26% 0.07 193)}
+    .priority-row:nth-child(4){background:var(--bg-1);border:1px solid var(--border-subtle)}
+    .priority-row:nth-child(5){background:var(--bg-1);border:1px solid var(--border-subtle)}
+    .priority-row:nth-child(6){background:var(--bg-1);border:1px solid var(--border-subtle)}
+    .priority-badge{font-family:var(--font-display);font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:99px;flex-shrink:0;min-width:60px;text-align:center}
+    .priority-row:nth-child(1) .priority-badge{background:var(--red-tint);color:var(--red);border:1px solid var(--red)}
+    .priority-row:nth-child(2) .priority-badge{background:var(--accent-tint);color:var(--accent);border:1px solid var(--accent-dim)}
+    .priority-row:nth-child(3) .priority-badge{background:oklch(15% 0.03 193);color:oklch(65% 0.10 193);border:1px solid oklch(35% 0.08 193)}
+    .priority-row:nth-child(4) .priority-badge,.priority-row:nth-child(5) .priority-badge,.priority-row:nth-child(6) .priority-badge{background:var(--bg-2);color:var(--text-3);border:1px solid var(--border-subtle)}
+    .priority-text{font-size:.875rem;color:var(--text-2)}
+    .priority-text strong{color:var(--text-1);font-weight:600}
+
+    /* DEMO STRUCTURE */
+    .demo-structure{display:flex;gap:var(--s4);margin-top:var(--s6)}
+    .demo-block{flex:1;background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:12px;padding:var(--s5)}
+    .demo-block-time{font-family:var(--font-display);font-size:2.5rem;font-weight:900;color:var(--accent);opacity:.35;line-height:1;margin-bottom:var(--s2)}
+    .demo-block-title{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--text-1);margin-bottom:var(--s2)}
+    .demo-block-desc{font-size:.83rem;color:var(--text-2);line-height:1.6}
+
+    /* RULES LIST */
+    .rules-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:var(--s3);margin-top:var(--s5)}
+    .rule-item{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s4) var(--s5);border-radius:10px;border:1px solid var(--border-subtle)}
+    .rule-item.rule-do{background:var(--green-tint);border-color:oklch(30% 0.09 152)}
+    .rule-item.rule-dont{background:var(--red-tint);border-color:oklch(30% 0.09 24)}
+    .rule-icon{font-size:1rem;flex-shrink:0;margin-top:2px}
+    .rule-text{font-size:.875rem;line-height:1.6;color:var(--text-2)}
+    .rule-text strong{color:var(--text-1);font-weight:600}
+
+    /* FEEDBACK QUESTIONS */
+    .feedback-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s4);margin-top:var(--s5)}
+    .feedback-card{background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:12px;padding:var(--s5)}
+    .feedback-q{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:var(--s2);line-height:1.3}
+    .feedback-hint{font-size:.83rem;color:var(--text-3);line-height:1.55}
+
+    /* NEXT STEPS */
+    .next-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--s4);margin-top:var(--s6)}
+    .next-card{background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:12px;padding:var(--s5)}
+    .next-icon{font-size:1.4rem;margin-bottom:var(--s3)}
+    .next-title{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--text-1);margin-bottom:var(--s2)}
+    .next-desc{font-size:.83rem;color:var(--text-3);line-height:1.55}
+    .next-urgency{display:inline-block;font-family:var(--font-display);font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:99px;margin-top:var(--s3)}
+    .next-urgency.high{background:var(--red-tint);color:var(--red);border:1px solid oklch(30% 0.09 24)}
+    .next-urgency.medium{background:var(--accent-tint);color:var(--accent);border:1px solid var(--accent-dim)}
+    .next-urgency.low{background:var(--bg-2);color:var(--text-3);border:1px solid var(--border-subtle)}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border-subtle);padding:var(--s7) 0;margin-top:var(--s9)}
+    .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--s4)}
+    .footer-brand{font-family:var(--font-display);font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+    .footer-brand strong{color:var(--accent)}
+    .footer-note{font-size:.75rem;color:var(--text-3)}
+
+    @media(max-width:640px){
+      nav.site-nav{padding:var(--s3) var(--s5)}
+      .container{padding:0 var(--s5)}
+      .hero{padding:100px 0 var(--s8)}
+      .demo-structure{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+<div id="progress"></div>
+
+<nav class="site-nav">
+  <a class="nav-brand" href="#">EducaciónIT · <strong>Vibe Coding</strong></a>
+  <ul class="nav-links">
+    <li><a class="nav-link active" href="#diagnostico">Diagnóstico</a></li>
+    <li><a class="nav-link" href="#build">Qué mejorar</a></li>
+    <li><a class="nav-link" href="#demo">Demo Day</a></li>
+    <li><a class="nav-link" href="#produccion">Producción</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Clase Integradora 2</div>
+    <h1 class="hero-title">
+      Del prototipo<br>al MVP
+    </h1>
+    <p class="hero-lead">Ya tenés algo que funciona. Hoy lo convertís en un producto que puede usar alguien que nunca estuvo en esta clase — y después lo presentás como si fuera a un cliente real.</p>
+    <div class="hero-chips">
+      <span class="chip accent">🔍 Diagnóstico honesto</span>
+      <span class="chip">🔨 Build Session #2</span>
+      <span class="chip">🎤 Demo Day</span>
+      <span class="chip">🚀 Próximos pasos reales</span>
+    </div>
+  </div>
+
+  <!-- DIAGNÓSTICO -->
+  <section class="content-section" id="diagnostico">
+    <div class="section-label">Bloque 1</div>
+    <h2 class="section-title">Checklist de diagnóstico</h2>
+    <div class="section-body">
+      <p>Antes de construir nada, necesitás saber exactamente dónde está parado tu producto. El método es simple y brutal: <strong>abrir la URL en una pestaña de incógnito y usarla como si fueras el cliente.</strong> No el desarrollador. El cliente.</p>
+      <p>Evaluá cada criterio con honestidad: ✓ está / ✗ no está / parcial. Al final, identificá los <strong>dos problemas más críticos</strong> para resolver hoy.</p>
+    </div>
+
+    <ul class="diag-list">
+      <li class="diag-item">
+        <div class="diag-num">1</div>
+        <div class="diag-content">
+          <div class="diag-title">El flujo principal funciona sin errores de consola</div>
+          <div class="diag-desc">Podés hacer la acción central de la app de principio a fin sin que nada se rompa visualmente ni aparezcan errores técnicos. El usuario nunca ve mensajes de error inesperados.</div>
+          <div class="diag-how">Cómo verificarlo: Abrir DevTools → pestaña Console. Hacer el flujo completo. ¿Hay errores en rojo? Si hay, el MVP no está listo.</div>
+        </div>
+      </li>
+      <li class="diag-item">
+        <div class="diag-num">2</div>
+        <div class="diag-content">
+          <div class="diag-title">Los datos se guardan y se recuperan correctamente de Supabase</div>
+          <div class="diag-desc">Cuando el usuario crea un registro, ese dato persiste aunque cierre el navegador. Cuando vuelve a abrir la app, los datos están exactamente como los dejó. La base de datos no es decorativa.</div>
+          <div class="diag-how">Cómo verificarlo: Crear un dato → cerrar la pestaña → reabrir la URL → verificar que el dato aparece.</div>
+        </div>
+      </li>
+      <li class="diag-item">
+        <div class="diag-num">3</div>
+        <div class="diag-content">
+          <div class="diag-title">La UI no se rompe en diferentes tamaños de pantalla</div>
+          <div class="diag-desc">Tanto en escritorio como en el celular, los elementos se ven correctamente. Nada se superpone, ningún texto desborda su contenedor, los botones son tocables en mobile.</div>
+          <div class="diag-how">Cómo verificarlo: Redimensionar la ventana del navegador hasta ~375px de ancho, o abrir en el celular.</div>
+        </div>
+      </li>
+      <li class="diag-item">
+        <div class="diag-num">4</div>
+        <div class="diag-content">
+          <div class="diag-title">Los estados vacíos están manejados</div>
+          <div class="diag-desc">Cuando no hay datos — primer acceso, tabla vacía, búsqueda sin resultados — el usuario ve un mensaje claro que le explica qué hacer. No una pantalla en blanco ni una lista vacía sin contexto.</div>
+          <div class="diag-how">Cómo verificarlo: Borrar todos los registros de la tabla principal y ver qué muestra la interfaz.</div>
+        </div>
+      </li>
+      <li class="diag-item">
+        <div class="diag-num">5</div>
+        <div class="diag-content">
+          <div class="diag-title">Se puede usar sin explicación previa</div>
+          <div class="diag-desc">Una persona que nunca vio tu app puede completar el flujo principal sin que le expliques nada. Si necesita que le cuentes qué significa cada botón o campo, el producto todavía no está listo para un cliente real.</div>
+          <div class="diag-how">Cómo verificarlo: Pedirle a alguien que nunca vio la app que la use. Observar sin intervenir. Cada vez que preguntan "¿qué hace esto?", es un gap de UX.</div>
+        </div>
+      </li>
+      <li class="diag-item">
+        <div class="diag-num">6</div>
+        <div class="diag-content">
+          <div class="diag-title">El texto es claro — el usuario sabe qué hacer en cada pantalla</div>
+          <div class="diag-desc">Los labels, botones, mensajes de error y placeholders usan el vocabulario del dominio real, no texto genérico. El usuario nunca se pregunta "¿qué se supone que hago acá?"</div>
+          <div class="diag-how">Cómo verificarlo: Leer todos los textos de la interfaz. ¿Hay "Enter text here", "Button", "My App"? ¿Los mensajes de error explican qué pasó y qué hacer?</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="pull-quote">
+      <p>"El diagnóstico honesto es la diferencia entre construir lo correcto y construir más de lo mismo que no funciona."</p>
+    </div>
+  </section>
+
+  <!-- BUILD: QUÉ MEJORAR PRIMERO -->
+  <section class="content-section" id="build">
+    <div class="section-label">Bloque 2</div>
+    <h2 class="section-title">Qué mejorar primero</h2>
+    <div class="section-body">
+      <p>Tenés 50 minutos de build. La tentación es atacar todo a la vez — no lo hagas. <strong>Un cambio, una prueba, confirmar que funciona. Recién ahí el siguiente.</strong> Si intentás refactorear todo de una vez, vas a terminar con el proyecto roto y sin tiempo.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text-1);margin-top:var(--s6);margin-bottom:var(--s2)">Orden de prioridad estricto</h3>
+    <div class="priority-stack">
+      <div class="priority-row">
+        <span class="priority-badge">Crítico</span>
+        <div class="priority-text"><strong>Flujo principal sin errores.</strong> Si el flujo central se rompe, todo lo demás es irrelevante.</div>
+      </div>
+      <div class="priority-row">
+        <span class="priority-badge">Alta</span>
+        <div class="priority-text"><strong>Datos que persisten en Supabase.</strong> Si la base de datos no funciona, la app no tiene valor.</div>
+      </div>
+      <div class="priority-row">
+        <span class="priority-badge">Alta</span>
+        <div class="priority-text"><strong>Estados vacíos y de error manejados.</strong> El usuario no puede quedar en blanco.</div>
+      </div>
+      <div class="priority-row">
+        <span class="priority-badge">Media</span>
+        <div class="priority-text"><strong>Copy y textos del dominio real.</strong> Sin placeholders genéricos ni texto de v0 sin personalizar.</div>
+      </div>
+      <div class="priority-row">
+        <span class="priority-badge">Media</span>
+        <div class="priority-text"><strong>Responsive básico.</strong> Que no se rompa en el celular.</div>
+      </div>
+      <div class="priority-row">
+        <span class="priority-badge">Después</span>
+        <div class="priority-text"><strong>Design polish.</strong> Colores, tipografía, animaciones. Solo si todo lo de arriba está resuelto.</div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text-1);margin-top:var(--s7);margin-bottom:var(--s2)">Problemas comunes y cómo resolverlos</h3>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-header">
+          <div class="problem-icon">🔐</div>
+          <div>
+            <div class="problem-title">Supabase RLS bloqueando lecturas o escrituras</div>
+            <span class="problem-symptom">La app no muestra ni guarda datos, pero tampoco da un error claro</span>
+          </div>
+        </div>
+        <div class="problem-fix">
+          <p>Ir a <strong>Supabase → Authentication → Policies</strong>. Si la tabla tiene RLS activado sin políticas definidas, bloquea todo por defecto.</p>
+          <p><strong>Para diagnosticar:</strong> desactivar RLS temporalmente ("Disable RLS" en la tabla) y verificar si los datos aparecen. Si sí, el problema está en las políticas.</p>
+          <p><strong>Para apps sin autenticación de usuario:</strong> crear una política con <span class="code-hint">USING (true)</span> para permitir lectura pública. Para escritura, <span class="code-hint">WITH CHECK (true)</span>.</p>
+          <p><strong>Prompt útil:</strong> "Mi app no tiene autenticación de usuarios. Necesito que cualquier persona pueda leer y escribir en la tabla [nombre]. ¿Qué política de RLS necesito en Supabase?"</p>
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-header">
+          <div class="problem-icon">📝</div>
+          <div>
+            <div class="problem-title">Formulario sin validación</div>
+            <span class="problem-symptom">Se puede enviar vacío o con datos inválidos sin ningún mensaje de error</span>
+          </div>
+        </div>
+        <div class="problem-fix">
+          <p><strong>Primer paso:</strong> atributo <span class="code-hint">required</span> en los campos del HTML. Rápido y funciona en todos los navegadores.</p>
+          <p><strong>Mensajes custom:</strong> manejar el estado de error en el componente y mostrar texto explicativo debajo del campo afectado. No solo un borde rojo — texto que dice qué está mal.</p>
+          <p><strong>Prompt:</strong> "Agregar validación al formulario. Los campos [lista] son requeridos. Si el usuario intenta enviar sin completarlos, mostrar un mensaje claro debajo de cada campo vacío. Deshabilitar el botón de envío hasta que los campos obligatorios estén completos."</p>
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-header">
+          <div class="problem-icon">📭</div>
+          <div>
+            <div class="problem-title">Estado vacío sin manejar</div>
+            <span class="problem-symptom">Lista vacía sin contexto: el usuario no sabe si algo falló o si simplemente no hay datos</span>
+          </div>
+        </div>
+        <div class="problem-fix">
+          <p>Condicionar el render: si el array tiene 0 elementos, mostrar un <strong>empty state</strong> en lugar de la lista vacía.</p>
+          <p>El empty state tiene tres partes: un ícono o ilustración, una línea de texto explicativa en el vocabulario del dominio, y un botón de call to action que lleva a crear el primer elemento.</p>
+          <p><strong>Prompt:</strong> "Cuando la lista de [entidad] esté vacía, mostrar un estado vacío con el ícono [emoji], el mensaje '[texto relevante del dominio]' y un botón que abre el formulario para crear el primer [entidad]."</p>
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-header">
+          <div class="problem-icon">⏳</div>
+          <div>
+            <div class="problem-title">Loading states ausentes</div>
+            <span class="problem-symptom">El usuario hace click y no pasa nada visible por 2-3 segundos — puede pensar que se rompió</span>
+          </div>
+        </div>
+        <div class="problem-fix">
+          <p>Deshabilitar el botón durante la operación y cambiar su texto. Es la implementación mínima viable de un loading state.</p>
+          <p>Para operaciones más largas: agregar un spinner o barra de progreso.</p>
+          <p><strong>Prompt:</strong> "Mientras se procesa el submit del formulario, deshabilitar el botón y cambiar su texto a 'Guardando...' con un spinner. Cuando la operación termina (éxito o error), restaurar el botón a su estado normal."</p>
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-header">
+          <div class="problem-icon">📱</div>
+          <div>
+            <div class="problem-title">Layout roto en pantallas angostas</div>
+            <span class="problem-symptom">Elementos superpuestos, texto desbordando, botones cortados o desaparecidos en mobile</span>
+          </div>
+        </div>
+        <div class="problem-fix">
+          <p>Revisar: ¿hay widths fijos que deberían ser <span class="code-hint">max-width</span>? ¿Flexbox sin <span class="code-hint">flex-wrap</span>? ¿Grid con columnas fijas que deberían ser <span class="code-hint">auto-fit</span>?</p>
+          <p><strong>Prompt:</strong> "Hacer el layout de [nombre de la vista] completamente responsive. En pantallas menores a 640px, apilar los elementos verticalmente. Asegurar que ningún texto ni elemento desborde el viewport. Los botones deben tener al menos 44px de altura para ser tocables en mobile."</p>
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-header">
+          <div class="problem-icon">💬</div>
+          <div>
+            <div class="problem-title">Texto genérico de v0 sin personalizar</div>
+            <span class="problem-symptom">Placeholders "Enter text here", títulos "My App", botones "Submit" o "Click here"</span>
+          </div>
+        </div>
+        <div class="problem-fix">
+          <p>Cada texto genérico rompe la ilusión de producto real. El copy es parte del diseño — dice quién sos y si entendés el problema del usuario.</p>
+          <p>Listar todos los textos de la interfaz y reemplazarlos por vocabulario específico del dominio.</p>
+          <p><strong>Prompt:</strong> "Revisar todos los textos, labels, placeholders y mensajes de la interfaz. Reemplazar cualquier texto genérico por texto específico del dominio [nombre del dominio], usando el vocabulario que usaría el usuario real. El tono debe ser [formal/informal/etc.]."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote" style="margin-top:var(--s7)">
+      <p>"El criterio de éxito del build no es que el código se vea prolijo. Es poder hacer el flujo completo en incógnito, de principio a fin, sin errores, sin explicaciones."</p>
+    </div>
+  </section>
+
+  <!-- DEMO DAY -->
+  <section class="content-section" id="demo">
+    <div class="section-label">Bloque 3</div>
+    <h2 class="section-title">Demo Day</h2>
+    <div class="section-body">
+      <p>Dos minutos por persona. No es una presentación técnica — es una <strong>demostración de valor</strong>. El objetivo es que el que escucha entienda para qué sirve, quién lo usa y por qué importa, sin que menciones una sola línea de código.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text-1);margin-top:var(--s6);margin-bottom:var(--s3)">Las tres reglas del demo</h3>
+    <ul class="rules-list">
+      <li class="rule-item rule-dont">
+        <div class="rule-icon">✗</div>
+        <div class="rule-text"><strong>No explicar el código.</strong> "Lo que hice fue conectar la tabla de Supabase con el componente React y..." — nadie que no sea desarrollador sabe qué significa eso. Hablá del problema y la solución desde el punto de vista del usuario.</div>
+      </li>
+      <li class="rule-item rule-dont">
+        <div class="rule-icon">✗</div>
+        <div class="rule-text"><strong>No decir "IA", "modelo", "API", "base de datos", "deploy".</strong> Estas palabras son invisibles para un cliente real. Usá el vocabulario del dominio — si es una app para turnos médicos, hablá de turnos, pacientes, consultorios, no de endpoints y webhooks.</div>
+      </li>
+      <li class="rule-item rule-dont">
+        <div class="rule-icon">✗</div>
+        <div class="rule-text"><strong>No pedir disculpas por lo que falta.</strong> No arranques diciendo "todavía me falta..." o "sé que no está terminado pero...". Mostrá lo que funciona con confianza. Los próximos pasos van al final, como hoja de ruta, no como disculpa.</div>
+      </li>
+      <li class="rule-item rule-do">
+        <div class="rule-icon">✓</div>
+        <div class="rule-text"><strong>Aplicar la estructura consultiva del Módulo 7.</strong> Quién tiene el problema → cuál es el problema concreto → qué hace tu solución → cuál es el beneficio específico y medible. Después, demo en vivo de la URL.</div>
+      </li>
+    </ul>
+
+    <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text-1);margin-top:var(--s6);margin-bottom:var(--s2)">Estructura de los 2 minutos</h3>
+    <div class="demo-structure">
+      <div class="demo-block">
+        <div class="demo-block-time">30s</div>
+        <div class="demo-block-title">Problema + usuario</div>
+        <div class="demo-block-desc">
+          <p style="margin-bottom:8px">¿Quién tiene el problema? ¿Qué problema concreto tienen? ¿Por qué importa resolverlo?</p>
+          <p style="font-style:italic;color:var(--text-3);font-size:.8rem">"Los dueños de veterinarias chicas pasan 90 minutos por día respondiendo las mismas preguntas de WhatsApp. Mi app responde esas preguntas automáticamente."</p>
+        </div>
+      </div>
+      <div class="demo-block">
+        <div class="demo-block-time">90s</div>
+        <div class="demo-block-title">Demo en vivo</div>
+        <div class="demo-block-desc">
+          <p style="margin-bottom:8px">Compartir pantalla con la URL de Vercel (o localhost:3000) abierta en incógnito. Hacer el flujo principal completo — el que muestra el valor central, no un tour de todas las pantallas.</p>
+          <p style="font-style:italic;color:var(--text-3);font-size:.8rem">Mostrar el flujo que resuelve el problema que describiste en los 30 segundos previos.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text-1);margin-top:var(--s6);margin-bottom:var(--s2)">Las tres preguntas de feedback del grupo</h3>
+    <div class="feedback-cards">
+      <div class="feedback-card">
+        <div class="feedback-q">"¿Entendiste para qué sirve?"</div>
+        <div class="feedback-hint">Evalúa claridad comunicacional. Si la mayoría no entendió, el problema de comunicación es tan importante como cualquier bug técnico.</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-q">"¿Lo usarías si tuvieras ese problema?"</div>
+        <div class="feedback-hint">Evalúa si la propuesta de valor es real. Respuesta honesta, no de cortesía. "Capaz" también es información útil.</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-q">"¿Qué le agregarías para que sea completamente real?"</div>
+        <div class="feedback-hint">Una sola cosa. No una lista. La más importante. Eso revela cuál es el gap más grande desde la perspectiva de alguien externo.</div>
+      </div>
+    </div>
+
+    <div class="pull-quote" style="margin-top:var(--s6)">
+      <p>"El cliente no elige solo una solución: elige a la persona que lo va a acompañar en un proceso de cambio. El demo no es de código — es de confianza."</p>
+    </div>
+  </section>
+
+  <!-- PRODUCCIÓN -->
+  <section class="content-section" id="produccion">
+    <div class="section-label">Cierre</div>
+    <h2 class="section-title">Próximos pasos a producción</h2>
+    <div class="section-body">
+      <p>Lo que construiste en estas dos clases es un MVP. No es producción todavía. Para que sea un producto real que pueda usar un cliente que pagó por él, hay piezas que faltan. Identificalas, priorizalas, y empezá por las más críticas para tu caso específico.</p>
+    </div>
+
+    <div class="next-grid">
+      <div class="next-card">
+        <div class="next-icon">🔑</div>
+        <div class="next-title">Autenticación de usuarios</div>
+        <div class="next-desc">Si la app maneja datos de usuarios o clientes, necesitás Supabase Auth o equivalente. Sin autenticación, cualquier persona puede ver o modificar todos los datos.</div>
+        <span class="next-urgency high">Crítico si hay datos privados</span>
+      </div>
+      <div class="next-card">
+        <div class="next-icon">🌐</div>
+        <div class="next-title">Dominio propio</div>
+        <div class="next-desc">La URL de Vercel sirve para demos. Un cliente real necesita ver un dominio propio — dice que tomás el proyecto en serio. Registrar en Namecheap, Porkbun o similar y conectarlo a Vercel.</div>
+        <span class="next-urgency high">Antes del primer cliente</span>
+      </div>
+      <div class="next-card">
+        <div class="next-icon">📊</div>
+        <div class="next-title">Plan pago de Supabase</div>
+        <div class="next-desc">El plan gratuito de Supabase pausa los proyectos después de 7 días de inactividad y tiene límites de filas y storage. Si la app va a tener usuarios reales con tráfico, upgradear antes de que lleguen.</div>
+        <span class="next-urgency medium">Cuando haya tráfico real</span>
+      </div>
+      <div class="next-card">
+        <div class="next-icon">👥</div>
+        <div class="next-title">Testing con usuarios reales</div>
+        <div class="next-desc">No con vos, no con compañeros del curso — con 3 a 5 personas que tengan el problema que la app resuelve y que nunca hayan visto el producto. Observar sin intervenir. Documentar dónde se traban.</div>
+        <span class="next-urgency high">Lo antes posible</span>
+      </div>
+      <div class="next-card">
+        <div class="next-icon">📄</div>
+        <div class="next-title">Documentación básica</div>
+        <div class="next-desc">Un README que explica qué hace la app, cómo se usa, qué datos guarda y cómo se despliega. Si alguien más tiene que mantenerla en 6 meses, ¿puede entenderla sin preguntarte?</div>
+        <span class="next-urgency medium">Antes de pasar el proyecto</span>
+      </div>
+      <div class="next-card">
+        <div class="next-icon">🔒</div>
+        <div class="next-title">Políticas de RLS en Supabase</div>
+        <div class="next-desc">Si desactivaste RLS para debugging, volvelo a activar con las políticas correctas antes de tener usuarios reales. Acceso sin restricciones a la base de datos no es una opción en producción.</div>
+        <span class="next-urgency high">Antes de producción</span>
+      </div>
+      <div class="next-card">
+        <div class="next-icon">🎯</div>
+        <div class="next-title">Primer cliente potencial</div>
+        <div class="next-desc">Identificar una persona real con el problema que resuelve la app. Mostrarle la demo. Preguntar honestamente: "¿Lo usarías? ¿Qué le falta para que lo uses?" Ese feedback vale más que 10 features nuevas.</div>
+        <span class="next-urgency high">Esta semana</span>
+      </div>
+      <div class="next-card">
+        <div class="next-icon">📈</div>
+        <div class="next-title">Métricas básicas</div>
+        <div class="next-desc">¿Cómo vas a saber si el producto está resolviendo el problema? Definir una métrica de éxito concreta antes de tener usuarios — no cantidad de visitas, sino el indicador que importa para el caso de uso.</div>
+        <span class="next-urgency low">Con usuarios activos</span>
+      </div>
+    </div>
+
+    <div class="pull-quote" style="margin-top:var(--s7)">
+      <p>"Construyeron algo que no existía hace dos semanas. La pregunta ya no es si podés hacerlo — es qué vas a hacer con eso."</p>
+    </div>
+
+    <div class="section-body" style="margin-top:var(--s5)">
+      <p><strong>Ejercicio de cierre:</strong> escribí tres próximos pasos concretos para tu proyecto específico. No genéricos — con nombre, acción y fecha. "Conseguir 5 personas del rubro para que prueben la app antes del [fecha]." Ese nivel de especificidad es el que produce resultados.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">EducaciónIT · <strong>Vibe Coding</strong></div>
+      <div class="footer-note">Clase Integradora 2 · Material del alumno · 2025</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const progressBar=document.getElementById('progress');
+window.addEventListener('scroll',()=>{
+  const scrolled=window.scrollY;
+  const total=document.documentElement.scrollHeight-window.innerHeight;
+  progressBar.style.width=(scrolled/total*100)+'%';
+});
+const navLinks=document.querySelectorAll('.nav-link[href^="#"]');
+const sections=document.querySelectorAll('section.content-section');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(l=>{
+        l.classList.toggle('active',l.getAttribute('href')==='#'+e.target.id);
+      });
+    }
+  });
+},{rootMargin:'-40% 0px -40% 0px',threshold:0});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
